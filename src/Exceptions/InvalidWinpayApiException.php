@@ -6,7 +6,7 @@ namespace Esyede\Winpay\V3\Exceptions;
 
 use Exception;
 
-class InvalidExpiredTimeException extends Exception
+class InvalidWinpayApiException extends Exception
 {
     // ..
 }

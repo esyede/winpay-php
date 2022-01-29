@@ -8,7 +8,7 @@ use DateTime;
 use DateTimeZone;
 use Esyede\Winpay\V3\BaseEndpoint;
 
-class OneOff
+class Recurring
 {
     private string $endpoint;
     private array $headers = [];
@@ -139,7 +139,7 @@ class OneOff
 
         $ch = curl_init();
         curl_setopt_array($ch, [
-            CURLOPT_URL => $this->endpoint . 'va/oneoff',
+            CURLOPT_URL => $this->endpoint . 'va/recurring',
             CURLOPT_POST => true,
             CURLOPT_POSTFIELDS => $payloads,
             CURLOPT_HTTPHEADER => $headers,
