@@ -12,9 +12,9 @@ $payloads = (new Payloads())
     ->setChannel('BSI')
     ->setAmount(10000)
     ->setExpiredTime(3)
-    ->setSuffix(0)
-    ->setDisplayName('PAY - BSI')
-    ->setDescription('Pembayaran Kaos Oblong')
+    ->setSuffix('0')
+    ->setDisplayName('NAMA MERCHANT')
+    ->setDescription('T1234567890')
     ->setCallbackUrl('https://tripay.co.id/calback/winpay-bsi');
 
 $va = (new VirtualAccount())
@@ -24,12 +24,17 @@ $va = (new VirtualAccount())
     ->setPayloads($payloads);
 
 // One-off payment
-var_dump($va->payOneOff()); die;
+// var_dump($va->payOneOff()); die;
 
 // Recurring payment
 // var_dump($va->payRecurring()); die;
 
 // Check payment status
-// $referenceNumber = 'T1234567890'; // Reference numbers from winpay transaction
-// var_dump($va->checkPaymentStatus($referenceNumber)); die;
+// $referenceNumber = 'sia788575c-8f4a-4dbf-a0e8-f32db5f21c2a'; // Reference numbers from winpay transaction
+// var_dump($va->checkStatus($referenceNumber)); die;
+
+
+// Cancel payment
+$referenceNumber = 'sia788575c-8f4a-4dbf-a0e8-f32db5f21c2a'; // Reference numbers from winpay transaction
+var_dump($va->cancelPayment($referenceNumber)); die;
 

@@ -13,23 +13,37 @@ class VirtualAccount
     private array $headers = [];
     private string $environment;
     private Payloads $payloads;
-
     // ----------------------------------------------------------------------------------
     // Setters
     // ----------------------------------------------------------------------------------
 
+    /**
+     * Set api key.
+     *
+     * @param string $apiKey
+     */
     public function setApiKey(string $apiKey): self
     {
         $this->apiKey = $apiKey;
         return $this;
     }
 
+    /**
+     * Set secret key.
+     *
+     * @param string $secretKey
+     */
     public function setSecretKey(string $secretKey): self
     {
         $this->secretKey = $secretKey;
         return $this;
     }
 
+    /**
+     * Set environment (isi dengan 'development' atau 'production')
+     *
+     * @param string $environment
+     */
     public function setEnvironment(string $environment = 'development'): self
     {
         if ($environment !== 'development' && $environment !== 'production') {
@@ -46,6 +60,11 @@ class VirtualAccount
         return $this;
     }
 
+    /**
+     * Set payload yang akan dikirim.
+     *
+     * @param Payloads $payloads
+     */
     public function setPayloads(Payloads $payloads)
     {
         $this->payloads = $payloads;
@@ -56,25 +75,53 @@ class VirtualAccount
     // Actual requests
     // ----------------------------------------------------------------------------------
 
+    /**
+     * Eksekusi pemnbayaran one-off (sekali bayar / closed payment).
+     *
+     * @return string
+     */
     public function payOneOff(): string
     {
         return $this->send('payment/va/oneoff');
     }
 
+    /**
+     * Eksekusi pembayaran recurring (berkelanjutan / open payment)
+     *
+     * @return string
+     */
     public function payRecurring(): string
     {
         return $this->send('payment/va/recurring');
     }
 
+    /**
+     * Cek status transaksi pembayaran.
+     *
+     * @param  string $refNum
+     *
+     * @return string
+     */
     public function checkStatus(string $refNum): string
     {
-        $this->payloads = (new Payloads())->setRefNum($refNum);
+        $payloads = (new Payloads())->setRefNum($refNum);
+        $this->setPayloads($payloads);
+
         return $this->send('payment/status');
     }
 
+    /**
+     * Batalkan transaksi pembayaran.
+     *
+     * @param  string $refNum
+     *
+     * @return string
+     */
     public function cancelPayment(string $refNum): string
     {
-        $this->payloads = (new Payloads())->setRefNum($refNum);
+        $payloads = (new Payloads())->setRefNum($refNum);
+        $this->setPayloads($payloads);
+
         return $this->send('payment/cancel');
     }
 
@@ -82,6 +129,13 @@ class VirtualAccount
     // Helper methods
     // ----------------------------------------------------------------------------------
 
+    /**
+     * Helper method untuk mengirim request.
+     *
+     * @param  string $endpoint
+     *
+     * @return string
+     */
     private function send(string $endpoint): string
     {
         $signature = base64_encode($this->apiKey . ':' . $this->secretKey);
@@ -108,20 +162,8 @@ class VirtualAccount
         $results = json_decode($results);
 
         if (! is_object($results)) {
-            return json_encode([
-                'success' => false,
-                'message' => 'Json decode returns a non-object value',
-                'results' => $results,
-                'payloads' => $payloads,
-                'url' => $url,
-            ], JSON_PRETTY_PRINT);
-        }
-
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            // Mimic winpay errors for consistency
             $errors = new stdClass();
-            $errors->errors = ['json' => 'Unable to parse json data'];
-
+            $errors->errors = ['json' => 'Json decode returns a non-object value'];
             return json_encode([
                 'success' => false,
                 'results' => $errors,
@@ -130,6 +172,18 @@ class VirtualAccount
             ], JSON_PRETTY_PRINT);
         }
 
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            $errors = new stdClass();
+            $errors->errors = ['json' => 'Unable to parse json data'];
+            return json_encode([
+                'success' => false,
+                'results' => $errors,
+                'payloads' => $payloads,
+                'url' => $url,
+            ], JSON_PRETTY_PRINT);
+        }
+
+        // Handle: payment errors
         if (isset($results->errors)) {
             return json_encode([
                 'success' => false,
@@ -139,7 +193,33 @@ class VirtualAccount
             ], JSON_PRETTY_PRINT);
         }
 
-        if ($results->rc !== '00' && strtolower($results->rd) !== 'success') {
+        // Handle: Check payment status
+        if (isset($results->ref_num) && isset($results->status)) {
+            return json_encode([
+                'success' => (isset($results->status) && strtolower(strval($results->status)) === 'paid'),
+                'results' => $results,
+                'payloads' => $payloads,
+                'url' => $url,
+            ], JSON_PRETTY_PRINT);
+        }
+
+        // Handle: Transaction requests & cancel payment
+        if (isset($results->rc) && isset($results->rd)) {
+            $success = ($results->rc === '00')
+                || (isset($results->ref_num)
+                    && isset($results->message)
+                    && (false !== strpos(strtolower($results->message), 'successfully cancelled')));
+
+            return json_encode([
+                'success' => ($results->rc === '00'),
+                'results' => $results,
+                'payloads' => $payloads,
+                'url' => $url,
+            ], JSON_PRETTY_PRINT);
+        }
+
+        // Handle: cancel payment (error)
+        if (count(get_object_vars($results)) === 1 && isset($results->message)) {
             return json_encode([
                 'success' => false,
                 'results' => $results,
@@ -149,7 +229,7 @@ class VirtualAccount
         }
 
         return json_encode([
-            'success' => true,
+            'success' => false,
             'results' => $results,
             'payloads' => $payloads,
             'url' => $url,
