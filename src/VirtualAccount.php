@@ -196,6 +196,7 @@ class VirtualAccount
         // Handle: Check payment status
         if (isset($results->ref_num) && isset($results->status)) {
             return json_encode([
+                // Success wiil be TRUE only when the status is 'paid'
                 'success' => (isset($results->status) && strtolower(strval($results->status)) === 'paid'),
                 'results' => $results,
                 'payloads' => $payloads,
@@ -203,15 +204,10 @@ class VirtualAccount
             ], JSON_PRETTY_PRINT);
         }
 
-        // Handle: Transaction requests & cancel payment
+        // Handle: Transaction requests
         if (isset($results->rc) && isset($results->rd)) {
-            $success = ($results->rc === '00')
-                || (isset($results->ref_num)
-                    && isset($results->message)
-                    && (false !== strpos(strtolower($results->message), 'successfully cancelled')));
-
             return json_encode([
-                'success' => ($results->rc === '00'),
+                'success' => ($results->rc === '00' && strtolower(strval($results->rd)) === 'sukses'),
                 'results' => $results,
                 'payloads' => $payloads,
                 'url' => $url,
@@ -222,6 +218,18 @@ class VirtualAccount
         if (count(get_object_vars($results)) === 1 && isset($results->message)) {
             return json_encode([
                 'success' => false,
+                'results' => $results,
+                'payloads' => $payloads,
+                'url' => $url,
+            ], JSON_PRETTY_PRINT);
+        }
+
+        // Handle: cancel payment success
+        if (count(get_object_vars($results)) === 2
+        && isset($results->ref_num)
+        && isset($results->message)) {
+            return json_encode([
+                'success' => (false !== strpos(strtolower(strval($results->message)), 'successfully cancelled')),
                 'results' => $results,
                 'payloads' => $payloads,
                 'url' => $url,

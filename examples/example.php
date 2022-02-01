@@ -13,13 +13,13 @@ $payloads = (new Payloads())
     ->setAmount(10000)
     ->setExpiredTime(3)
     ->setSuffix('0')
-    ->setDisplayName('MERCHANT NAME')
+    ->setDisplayName('NAMA MERCHANT')
     ->setDescription('T1234567890')
-    ->setCallbackUrl('https://mysite.com/calback/winpay-bsi');
+    ->setCallbackUrl('https://tripay.co.id/calback/winpay-bsi');
 
 $va = (new VirtualAccount())
-    ->setApiKey('your_api_key')
-    ->setSecretKey('your_secret_key')
+    ->setApiKey('4d0cba482565a4380286a886')
+    ->setSecretKey('48fac6002005607b7ba79d210ef38d1c36b433cc')
     ->setEnvironment('development')
     ->setPayloads($payloads);
 
@@ -30,11 +30,11 @@ $va = (new VirtualAccount())
 // var_dump($va->payRecurring()); die;
 
 // Check payment status
-// $referenceNumber = 'sia788575c-8f4a-4dbf-a0e8-f32db5f21c2a'; // Reference numbers from winpay transaction
-// var_dump($va->checkStatus($referenceNumber)); die;
+$referenceNumber = 'siae301606-486e-4f03-829a-fc902e4075c8'; // Reference numbers from winpay transaction
+var_dump($va->checkStatus($referenceNumber)); die;
 
 
 // Cancel payment
-$referenceNumber = 'sia788575c-8f4a-4dbf-a0e8-f32db5f21c2a'; // Reference numbers from winpay transaction
-var_dump($va->cancelPayment($referenceNumber)); die;
+// $referenceNumber = 'si277c41b3-54ed-4c94-b918-3f955bad2b69'; // Reference numbers from winpay transaction
+// var_dump($va->cancelPayment($referenceNumber)); die;
 
