@@ -1,0 +1,28 @@
+{
+    "name": "esyede/winpay-php",
+    "description": "Integration Library for Winpay.id v3",
+    "type": "library",
+    "require": {
+        "php": ">=7.4.0",
+        "ext-curl": "*",
+        "ext-json": "*"
+    },
+    "license": "MIT",
+    "homepage": "https://github.com/esyede/winpay-php",
+    "support": {
+        "issues": "https://github.com/esyede/winpay-php/issues",
+        "source": "https://github.com/esyede/winpay-php"
+    },
+    "authors": [
+        {
+            "name": "Suyadi",
+            "email": "suyadi.1992@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "autoload": {
+        "psr-4": {
+            "Esyede\\Winpay\\": "src/"
+        }
+    }
+}

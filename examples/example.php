@@ -13,13 +13,13 @@ $payloads = (new Payloads())
     ->setAmount(10000)
     ->setExpiredTime(3)
     ->setSuffix('0')
-    ->setDisplayName('NAMA MERCHANT')
+    ->setDisplayName('MERCHANT NAME')
     ->setDescription('T1234567890')
-    ->setCallbackUrl('https://tripay.co.id/calback/winpay-bsi');
+    ->setCallbackUrl('https://mysite.com/calback/winpay-bsi');
 
 $va = (new VirtualAccount())
-    ->setApiKey('4d0cba482565a4380286a886')
-    ->setSecretKey('48fac6002005607b7ba79d210ef38d1c36b433cc')
+    ->setApiKey('your_api_key')
+    ->setSecretKey('your_secret_key')
     ->setEnvironment('development')
     ->setPayloads($payloads);
 
