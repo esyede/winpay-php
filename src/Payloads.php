@@ -13,7 +13,7 @@ class Payloads
     private string $channel;
     private int $amount;
     private string $expiredTime;
-    private int $suffix;
+    private string $suffix;
     private string $displayName;
     private string $callbackUrl;
     private string $description;
@@ -44,7 +44,7 @@ class Payloads
         return $this;
     }
 
-    public function setSuffix(int $suffix): self
+    public function setSuffix(string $suffix): self
     {
         $this->suffix = $suffix;
         return $this;

@@ -30,7 +30,6 @@ class VirtualAccount
 
     public function setEnvironment(string $environment = 'development'): self
     {
-        // var_dump($environment);
         if ($environment !== 'development' && $environment !== 'production') {
             throw new Exceptions\InvalidWinpayEnvironmentException(
                 "Only 'production' and 'development' environment are supported."
@@ -87,13 +86,11 @@ class VirtualAccount
         $url = $this->environment . '/' . ltrim($endpoint, '/');
         $payloads = $this->payloads->toArray();
 
-        // var_dump($signature, $url, $payloads); die;
-
         $ch = curl_init();
         curl_setopt_array($ch, [
             CURLOPT_URL => $url,
             CURLOPT_POST => true,
-            CURLOPT_POSTFIELDS =>  $payloads,
+            CURLOPT_POSTFIELDS =>  json_encode($payloads),
             CURLOPT_HTTPHEADER => [
                 'Authentication: Basic ' . $signature,
                 'Content-Type: application/json',
@@ -102,40 +99,48 @@ class VirtualAccount
             CURLOPT_HEADER => false,
         ]);
 
-        $data = curl_exec($ch);
+        $results = curl_exec($ch);
         $errno = curl_errno($ch);
         $error = curl_error($ch);
 
-        $data = json_decode($data);
+        $results = json_decode($results);
 
-        if (! is_object($data)) {
+        if (! is_object($results)) {
             return json_encode([
                 'success' => false,
                 'message' => 'Json decode returns a non-object value',
-                'data' => $data,
-            ]);
+                'results' => $results,
+                'payloads' => $payloads,
+                'url' => $url,
+            ], JSON_PRETTY_PRINT);
         }
 
         if (json_last_error() !== JSON_ERROR_NONE) {
             return json_encode([
                 'success' => false,
-                'message' => 'Unable to parse json data',
-                'data' => null,
-            ]);
+                'message' => 'Unable to parse json results',
+                'results' => null,
+                'payloads' => $payloads,
+                'url' => $url,
+            ], JSON_PRETTY_PRINT);
         }
 
-        if ($data->rc !== '00' && strtolower($data->rd) !== 'success') {
+        if ($results->rc !== '00' && strtolower($results->rd) !== 'success') {
             return json_encode([
                 'success' => false,
-                'message' => $data->rd,
-                'data' => $data,
-            ]);
+                'message' => $results->rd,
+                'results' => $results,
+                'payloads' => $payloads,
+                'url' => $url,
+            ], JSON_PRETTY_PRINT);
         }
 
         return json_encode([
             'success' => true,
-            'message' => $data->rd,
-            'data' => $data,
-        ]);
+            'message' => $results->rd,
+            'results' => $results,
+            'payloads' => $payloads,
+            'url' => $url,
+        ], JSON_PRETTY_PRINT);
     }
 }
