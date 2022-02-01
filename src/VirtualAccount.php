@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Esyede\Winpay;
 
+use stdClass;
+
 class VirtualAccount
 {
     private string $apiKey;
@@ -92,8 +94,8 @@ class VirtualAccount
             CURLOPT_POST => true,
             CURLOPT_POSTFIELDS =>  json_encode($payloads),
             CURLOPT_HTTPHEADER => [
-                'Authentication: Basic ' . $signature,
                 'Content-Type: application/json',
+                'Authorization: Basic ' . $signature,
             ],
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_HEADER => false,
@@ -116,10 +118,22 @@ class VirtualAccount
         }
 
         if (json_last_error() !== JSON_ERROR_NONE) {
+            // Mimic winpay errors for consistency
+            $errors = new stdClass();
+            $errors->errors = ['json' => 'Unable to parse json data'];
+
             return json_encode([
                 'success' => false,
-                'message' => 'Unable to parse json results',
-                'results' => null,
+                'results' => $errors,
+                'payloads' => $payloads,
+                'url' => $url,
+            ], JSON_PRETTY_PRINT);
+        }
+
+        if (isset($results->errors)) {
+            return json_encode([
+                'success' => false,
+                'results' => $results,
                 'payloads' => $payloads,
                 'url' => $url,
             ], JSON_PRETTY_PRINT);
@@ -128,7 +142,6 @@ class VirtualAccount
         if ($results->rc !== '00' && strtolower($results->rd) !== 'success') {
             return json_encode([
                 'success' => false,
-                'message' => $results->rd,
                 'results' => $results,
                 'payloads' => $payloads,
                 'url' => $url,
@@ -137,7 +150,6 @@ class VirtualAccount
 
         return json_encode([
             'success' => true,
-            'message' => $results->rd,
             'results' => $results,
             'payloads' => $payloads,
             'url' => $url,
