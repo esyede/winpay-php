@@ -38,7 +38,7 @@ class Payloads
 
         $date = (new DateTime('now', new DateTimeZone('Asia/Jakarta')))
             ->add(new DateInterval('PT' . $minutes . 'M'))
-            ->format('Ymdhi');
+            ->format('YmdHi');
 
         $this->expiredTime = $date;
         return $this;
