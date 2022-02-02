@@ -10,14 +10,14 @@ use DateInterval;
 
 class Payloads
 {
-    private ?string $channel = null;
-    private int $amount = 0;
-    private ?string $expiredTime = null;
-    private ?string $suffix = null;
-    private ?string $displayName = null;
-    private ?string $callbackUrl = null;
-    private ?string $description = null;
-    private ?string $refNum = null;
+    private $channel;
+    private $amount = 0;
+    private $expiredTime;
+    private $suffix;
+    private $displayName;
+    private $callbackUrl;
+    private $description;
+    private $refNum;
 
     /**
      * Set channel pembayaran (e.g: BSI)

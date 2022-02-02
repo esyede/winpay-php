@@ -8,11 +8,11 @@ use stdClass;
 
 class VirtualAccount
 {
-    private string $apiKey;
-    private string $secretKey;
-    private array $headers = [];
-    private string $environment;
-    private Payloads $payloads;
+    private $apiKey;
+    private $secretKey;
+    private $headers = [];
+    private $environment;
+    private $payloads;
     // ----------------------------------------------------------------------------------
     // Setters
     // ----------------------------------------------------------------------------------
@@ -159,6 +159,18 @@ class VirtualAccount
         $errno = curl_errno($ch);
         $error = curl_error($ch);
 
+        if ($errno) {
+            $errors = new stdClass();
+            $errors->errors = ['curl' => $error];
+            return json_encode([
+                'success' => false,
+                'results' => $errors,
+                'payloads' => $payloads,
+                'url' => $url,
+            ], JSON_PRETTY_PRINT);
+        }
+
+        $results = is_string($results) ? $results : strval($results);
         $results = json_decode($results);
 
         if (! is_object($results)) {
