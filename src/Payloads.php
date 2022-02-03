@@ -50,8 +50,7 @@ class Payloads
      */
     public function setExpiredTime(int $hours): self
     {
-        $hours = ($hours < 1) ? 1 : (($hours > 3) ? 3 : $hours);
-        $minutes = $hours * 60;
+        $minutes = ($hours <= 1) ? 61 : (($hours >= 3) ? 179 : ($hours * 60));
 
         $date = (new DateTime('now', new DateTimeZone('Asia/Jakarta')))
             ->add(new DateInterval('PT' . $minutes . 'M'))
