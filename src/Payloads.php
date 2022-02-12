@@ -44,13 +44,13 @@ class Payloads
 
     /**
      * Set waktu kedaluwarsa invoice.
-     * Dalam hitungan jam, min. 1, max. 3.
+     * Dalam hitungan menit, maks. 180.
      *
-     * @param int $hours
+     * @param int $minutes
      */
-    public function setExpiredTime(int $hours): self
+    public function setExpiredTime(int $minutes): self
     {
-        $minutes = ($hours <= 1) ? 61 : (($hours >= 3) ? 179 : ($hours * 60));
+        $minutes = ($minutes <= 60) ? 61 : (($minutes >= 180) ? 179 : $minutes);
 
         $date = (new DateTime('now', new DateTimeZone('Asia/Jakarta')))
             ->add(new DateInterval('PT' . $minutes . 'M'))
