@@ -3,6 +3,7 @@
 require_once '../src/Payloads.php';
 require_once '../src/VirtualAccount.php';
 require_once '../src/Exceptions/InvalidWinpayEnvironmentException.php';
+require_once '../src/Exceptions/InvalidWinpayDateException.php';
 
 use Esyede\Winpay\Payloads;
 use Esyede\Winpay\Environment;
@@ -31,7 +32,9 @@ $va = (new VirtualAccount())
 
 // Check payment status
 $referenceNumber = 'siae301606-486e-4f03-829a-fc902e4075c8'; // Reference numbers from winpay transaction
-var_dump($va->checkStatus($referenceNumber)); die;
+$paymentStartDate = '20220507';
+$paymentEndDate = '20220508';
+var_dump($va->checkStatus($referenceNumber, $paymentStartDate, $paymentEndDate)); die;
 
 
 // Cancel payment

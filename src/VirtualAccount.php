@@ -13,6 +13,7 @@ class VirtualAccount
     private $headers = [];
     private $environment;
     private $payloads;
+
     // ----------------------------------------------------------------------------------
     // Setters
     // ----------------------------------------------------------------------------------
@@ -99,12 +100,18 @@ class VirtualAccount
      * Cek status transaksi pembayaran.
      *
      * @param  string $refNum
+     * @param  string $stratDate
+     * @param  string $endDate
      *
      * @return string
      */
-    public function checkStatus(string $refNum): string
+    public function checkStatus(string $refNum, string $startDate, string $endDate): string
     {
-        $payloads = (new Payloads())->setRefNum($refNum);
+        $payloads = (new Payloads())
+            ->setRefNum($refNum)
+            ->setStartDate($startDate)
+            ->setEndDate($startDate);
+
         $this->setPayloads($payloads);
 
         return $this->send('payment/status');

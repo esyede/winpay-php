@@ -18,6 +18,8 @@ class Payloads
     private $callbackUrl;
     private $description;
     private $refNum;
+    private $startDate;
+    private $endDate;
 
     /**
      * Set channel pembayaran (e.g: BSI)
@@ -125,6 +127,44 @@ class Payloads
     }
 
     /**
+     * Set tanggal awal
+     *
+     * @param string $startDate
+     */
+    public function setStartDate(string $startDate)
+    {
+        $startDate = (new DateTime($startDate, new DateTimeZone('Asia/Jakarta')));
+
+        if (! $startDate) {
+            throw new Exceptions\InvalidWinpayDateException(sprintf(
+                'Invalid end-date format: %s', $startDate
+            ));
+        }
+
+        $this->startDate = $startDate->format('Ymd');
+        return $this;
+    }
+
+    /**
+     * Set tanggal akhir
+     *
+     * @param string $startDate
+     */
+    public function setEndDate(string $endDate)
+    {
+        $endDate = (new DateTime($endDate, new DateTimeZone('Asia/Jakarta')));
+
+        if (! $endDate) {
+            throw new Exceptions\InvalidWinpayDateException(sprintf(
+                'Invalid end-date format: %s', $endDate
+            ));
+        }
+
+        $this->endDate = $endDate->format('Ymd');
+        return $this;
+    }
+
+    /**
      * Ambil payload dalam bentuk array.
      *
      * @return array
@@ -140,6 +180,8 @@ class Payloads
             'callback_url' => $this->callbackUrl,
             'description' => $this->description,
             'ref_num' => $this->refNum,
+            'payment_start_date' => $this->startDate,
+            'payment_end_date' => $this->endDate,
         ];
     }
 
