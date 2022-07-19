@@ -110,7 +110,7 @@ class VirtualAccount
         $payloads = (new Payloads())
             ->setRefNum($refNum)
             ->setStartDate($startDate)
-            ->setEndDate($startDate);
+            ->setEndDate($endDate);
 
         $this->setPayloads($payloads);
 
